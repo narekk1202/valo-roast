@@ -1,3 +1,5 @@
+import { RoastLanding } from '@/components/roast/roast-landing'
+
 export default function Home() {
-	return <div></div>;
+	return <RoastLanding />
 }

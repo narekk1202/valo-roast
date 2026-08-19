@@ -7,9 +7,10 @@
 @theme inline {
 	--color-background: var(--background);
 	--color-foreground: var(--foreground);
-	--font-sans: var(--font-sans);
-	--font-mono: var(--font-geist-mono);
-	--font-heading: var(--font-sans);
+	--font-sans: var(--font-ibm-sans);
+	--font-mono: var(--font-ibm-mono);
+	--font-heading: var(--font-teko);
+	--animate-reveal: reveal 0.85s cubic-bezier(0.16, 1, 0.3, 1) both;
 	--color-sidebar-ring: var(--sidebar-ring);
 	--color-sidebar-border: var(--sidebar-border);
 	--color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
@@ -81,10 +82,10 @@
 	--sidebar-accent-foreground: oklch(0.1763 0.014 258.3572);
 	--sidebar-border: oklch(0.9674 0.0013 286.3752);
 	--sidebar-ring: oklch(0.5882 0.2309 28.2936);
-	--font-sans: 'Inter', sans-serif;
+	--font-sans: 'IBM Plex Sans', sans-serif;
 	--font-serif: 'Georgia', serif;
-	--font-mono: 'JetBrains Mono', monospace;
-	--radius: 0.75rem;
+	--font-mono: 'IBM Plex Mono', monospace;
+	--radius: 0.15rem;
 	--shadow-x: 0px;
 	--shadow-y: 4px;
 	--shadow-blur: 10px;
@@ -109,7 +110,7 @@
 }
 
 .dark {
-	--background: oklch(0.1645 0.0086 274.3354);
+	--background: oklch(0.12 0.012 265);
 	--foreground: oklch(0.9911 0 0);
 	--card: oklch(0.2145 0.0184 270.4182);
 	--card-foreground: oklch(0.9911 0 0);
@@ -141,10 +142,10 @@
 	--sidebar-accent-foreground: oklch(0.9911 0 0);
 	--sidebar-border: oklch(0.2739 0.0055 286.0326);
 	--sidebar-ring: oklch(0.6453 0.2404 27.3106);
-	--font-sans: 'Inter', sans-serif;
+	--font-sans: 'IBM Plex Sans', sans-serif;
 	--font-serif: 'Georgia', serif;
-	--font-mono: 'JetBrains Mono', monospace;
-	--radius: 0.75rem;
+	--font-mono: 'IBM Plex Mono', monospace;
+	--radius: 0.15rem;
 	--shadow-x: 0px;
 	--shadow-y: 8px;
 	--shadow-blur: 15px;
@@ -200,9 +201,11 @@
 	--color-sidebar-border: var(--sidebar-border);
 	--color-sidebar-ring: var(--sidebar-ring);
 
-	--font-sans: var(--font-sans);
-	--font-mono: var(--font-mono);
+	--font-sans: var(--font-ibm-sans);
+	--font-mono: var(--font-ibm-mono);
 	--font-serif: var(--font-serif);
+	--font-heading: var(--font-teko);
+	--animate-reveal: reveal 0.85s cubic-bezier(0.16, 1, 0.3, 1) both;
 
 	--radius-sm: calc(var(--radius) - 4px);
 	--radius-md: calc(var(--radius) - 2px);
@@ -234,4 +237,67 @@
 		@apply bg-background text-foreground;
 		letter-spacing: var(--tracking-normal);
 	}
+}
+
+@keyframes reveal {
+	from {
+		opacity: 0;
+		transform: translateY(0.85rem);
+	}
+	to {
+		opacity: 1;
+		transform: none;
+	}
+}
+
+[data-reveal] {
+	animation: reveal 0.85s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+[data-reveal='1'] {
+	animation-delay: 0.08s;
+}
+[data-reveal='2'] {
+	animation-delay: 0.16s;
+}
+[data-reveal='3'] {
+	animation-delay: 0.24s;
+}
+[data-reveal='4'] {
+	animation-delay: 0.32s;
+}
+[data-reveal='5'] {
+	animation-delay: 0.4s;
+}
+
+.atmosphere-grid {
+	background-image:
+		linear-gradient(
+			to right,
+			color-mix(in oklch, var(--border) 55%, transparent) 1px,
+			transparent 1px
+		),
+		linear-gradient(
+			to bottom,
+			color-mix(in oklch, var(--border) 55%, transparent) 1px,
+			transparent 1px
+		);
+	background-size: 56px 56px;
+	mask-image: radial-gradient(ellipse at center, black 10%, transparent 72%);
+	opacity: 0.45;
+}
+
+.atmosphere-scan {
+	background: repeating-linear-gradient(
+		to bottom,
+		transparent 0,
+		transparent 2px,
+		color-mix(in oklch, var(--foreground) 8%, transparent) 3px
+	);
+	opacity: 0.35;
+}
+
+.atmosphere-grain {
+	opacity: 0.22;
+	background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='180' height='180'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/></filter><rect width='100%' height='100%' filter='url(%23n)' opacity='0.55'/></svg>");
 }
