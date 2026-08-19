@@ -21,7 +21,7 @@ function RiotIdField({
 	id = 'riot-id',
 	label = landingCopy.riotIdLabel,
 	defaultValue = landingCopy.riotIdSample,
-	placeholder = 'Name#TAG',
+	placeholder = 'Narek#03270624',
 	disabled = false,
 }: RiotIdFieldProps) {
 	return (

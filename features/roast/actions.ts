@@ -1,6 +1,7 @@
 'use server';
 
 import z from 'zod';
+import { generateRoast } from './lib/generate-roast';
 import { getPlayerData } from './lib/get-player-data';
 import { RiotId, schema } from './schemas';
 import { PlayerAnalysis, RiotAccountData } from './types';
@@ -12,6 +13,7 @@ export type PrevState = {
 		account: RiotAccountData;
 		analysis: PlayerAnalysis;
 	} | null;
+	roast: string | null;
 };
 
 export async function getPlayerStats(
@@ -31,6 +33,7 @@ export async function getPlayerStats(
 			error: errorMessage,
 			riotId: null,
 			data: null,
+			roast: null,
 		};
 	}
 
@@ -45,6 +48,18 @@ export async function getPlayerStats(
 			error: result.error,
 			riotId: validated.data,
 			data: null,
+			roast: null,
+		};
+	}
+
+	const roastResult = await generateRoast(result.data.analysis);
+
+	if (!roastResult.ok) {
+		return {
+			error: roastResult.error,
+			riotId: validated.data,
+			data: result.data,
+			roast: null,
 		};
 	}
 
@@ -52,5 +67,6 @@ export async function getPlayerStats(
 		error: null,
 		riotId: validated.data,
 		data: result.data,
+		roast: roastResult.data,
 	};
 }
