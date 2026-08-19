@@ -10,7 +10,10 @@ type RoastCtaProps = {
 function RoastCta({ label = landingCopy.cta, isPending }: RoastCtaProps) {
 	return (
 		<Button type='submit' size='cta' disabled={isPending}>
-			{isPending ? <Loader2 className='animate-spin' /> : label}
+			{isPending ? (
+				<Loader2 data-icon='inline-start' className='animate-spin' />
+			) : null}
+			{isPending ? 'Scanning' : label}
 		</Button>
 	);
 }

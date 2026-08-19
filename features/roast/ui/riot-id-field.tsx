@@ -14,6 +14,7 @@ type RiotIdFieldProps = {
 	label?: string;
 	defaultValue?: string;
 	placeholder?: string;
+	disabled?: boolean;
 };
 
 function RiotIdField({
@@ -21,9 +22,10 @@ function RiotIdField({
 	label = landingCopy.riotIdLabel,
 	defaultValue = landingCopy.riotIdSample,
 	placeholder = 'Name#TAG',
+	disabled = false,
 }: RiotIdFieldProps) {
 	return (
-		<Field>
+		<Field data-disabled={disabled || undefined}>
 			<FieldLabel htmlFor={id}>{label}</FieldLabel>
 			<HudFrame>
 				<InputGroup className='h-12'>
@@ -34,6 +36,7 @@ function RiotIdField({
 						placeholder={placeholder}
 						autoComplete='off'
 						spellCheck={false}
+						disabled={disabled}
 					/>
 					<InputGroupAddon align='inline-end'>
 						<SearchIcon aria-hidden />

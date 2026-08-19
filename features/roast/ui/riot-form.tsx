@@ -5,24 +5,26 @@ import { useActionState } from 'react';
 import { getPlayerStats } from '../actions';
 import { RiotIdField } from './riot-id-field';
 import { RoastCta } from './roast-cta';
+import { RoastPending } from './roast-pending';
 
 function RiotForm() {
-	const [state, formAction] = useActionState(getPlayerStats, {
+	const [state, formAction, isPending] = useActionState(getPlayerStats, {
 		error: null,
 		riotId: null,
 		data: null,
 	});
 
 	return (
-		<form action={formAction}>
+		<form action={formAction} aria-busy={isPending}>
 			<Stack gap='md' align='center' className='w-full'>
-				<RiotIdField />
-				{state.error ? (
+				<RiotIdField disabled={isPending} />
+				{isPending ? <RoastPending /> : null}
+				{state.error && !isPending ? (
 					<p aria-live='polite' className='text-destructive text-sm'>
 						{state.error}
 					</p>
 				) : null}
-				<RoastCta />
+				<RoastCta isPending={isPending} />
 			</Stack>
 		</form>
 	);
