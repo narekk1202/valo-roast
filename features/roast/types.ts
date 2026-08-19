@@ -26,9 +26,9 @@ export interface RiotApiResponse<T = unknown> {
 
 export interface ValorantMatch {
 	is_available: boolean;
-	metadata: MatchMetadata;
-	players: MatchPlayers;
-	teams: MatchTeams;
+	metadata: MatchMetadata | null;
+	players: MatchPlayers | null;
+	teams: MatchTeams | null;
 	rounds: MatchRound[];
 	kills: MatchKill[];
 }
@@ -62,7 +62,7 @@ export interface MatchPlayer {
 	tag: string;
 	team: string;
 	level: number;
-	character: string;
+	character: string | null;
 	currenttier: number;
 	currenttier_patched: string;
 	player_card: string;
@@ -79,11 +79,11 @@ export interface MatchPlayer {
 	};
 
 	ability_casts: {
-		x_cast: number;
-		e_cast: number;
-		q_cast: number;
-		c_cast: number;
-	};
+		x_cast: number | null;
+		e_cast: number | null;
+		q_cast: number | null;
+		c_cast: number | null;
+	} | null;
 
 	stats: {
 		score: number;
@@ -116,9 +116,9 @@ export interface MatchTeams {
 }
 
 export interface MatchTeam {
-	has_won: boolean;
-	rounds_won: number;
-	rounds_lost: number;
+	has_won: boolean | null;
+	rounds_won: number | null;
+	rounds_lost: number | null;
 }
 
 export interface MatchRound {
@@ -239,7 +239,7 @@ export interface PlayerMatchAnalysis {
 	duration: number;
 	rounds: number;
 
-	result: 'win' | 'loss';
+	result: 'win' | 'loss' | 'draw';
 
 	agent: string;
 
@@ -266,11 +266,15 @@ export interface PlayerMatchAnalysis {
 
 	afkRounds: number;
 	roundsInSpawn: number;
+	friendlyFireOutgoing: number;
 
 	abilityCasts: number;
 
 	spent: number;
 	averageLoadoutValue: number;
+
+	rank: string;
+	rankId: number;
 }
 
 export interface PlayerAnalysis {
@@ -287,6 +291,7 @@ export interface PlayerAnalysis {
 		total: number;
 		wins: number;
 		losses: number;
+		draws: number;
 		winRate: number;
 	};
 

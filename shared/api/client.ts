@@ -23,7 +23,7 @@ export class RiotApiClient {
 		this.apiKey = apiKey;
 	}
 
-	async get<T>(path: string): Promise<JsonGetResult<T>> {
+	async get<T = unknown>(path: string): Promise<JsonGetResult<T>> {
 		try {
 			const response = await fetch(`${this.baseUrl}${path}`, {
 				headers: {

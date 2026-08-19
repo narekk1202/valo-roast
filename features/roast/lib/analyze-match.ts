@@ -1,68 +1,106 @@
-import { PlayerMatchAnalysis, ValorantMatch } from '../types';
+import { MatchKill, MatchTeams, PlayerMatchAnalysis, ValorantMatch } from '../types';
 
-function getOpeningKills(match: ValorantMatch, puuid: string) {
+const SKIP_MODE_IDS = new Set([
+	'deathmatch',
+	'ggteam',
+	'onefa',
+	'snowball',
+	'hurm',
+]);
+
+const SKIP_MODE_NAME = /deathmatch|escalation|replication|snowball/;
+
+function num(value: number | null | undefined): number {
+	return value ?? 0;
+}
+
+function isAnalyzableMode(mode: string, modeId: string): boolean {
+	if (SKIP_MODE_IDS.has(modeId.toLowerCase())) {
+		return false;
+	}
+
+	return !SKIP_MODE_NAME.test(mode.toLowerCase());
+}
+
+function getOpeningKills(kills: MatchKill[], puuid: string) {
+	const firstByRound = new Map<number, MatchKill>();
+
+	for (const kill of kills) {
+		const existing = firstByRound.get(kill.round);
+		if (
+			!existing ||
+			kill.kill_time_in_round < existing.kill_time_in_round
+		) {
+			firstByRound.set(kill.round, kill);
+		}
+	}
+
 	let firstKills = 0;
 	let firstDeaths = 0;
 
-	for (let round = 1; round <= match.metadata.rounds_played; round++) {
-		const firstKill = match.kills.find(kill => kill.round === round);
-
-		if (!firstKill) {
-			continue;
-		}
-
-		if (firstKill.killer_puuid === puuid) {
+	for (const kill of firstByRound.values()) {
+		if (kill.killer_puuid === puuid) {
 			firstKills++;
 		}
-
-		if (firstKill.victim_puuid === puuid) {
+		if (kill.victim_puuid === puuid) {
 			firstDeaths++;
 		}
 	}
 
-	return {
-		firstKills,
-		firstDeaths,
-	};
+	return { firstKills, firstDeaths };
+}
+
+function matchResult(
+	teamName: string,
+	teams: MatchTeams,
+): PlayerMatchAnalysis['result'] {
+	const team = teamName.toLowerCase();
+	if (team !== 'red' && team !== 'blue') {
+		return 'draw';
+	}
+
+	const redWon = teams.red.has_won === true;
+	const blueWon = teams.blue.has_won === true;
+	if (redWon === blueWon) {
+		return 'draw';
+	}
+
+	const won = team === 'red' ? redWon : blueWon;
+	return won ? 'win' : 'loss';
 }
 
 export function analyzeMatch(
 	match: ValorantMatch,
 	puuid: string,
-): PlayerMatchAnalysis {
-	const player = match.players.all_players.find(
-		player => player.puuid === puuid,
-	);
-
-	const { firstKills, firstDeaths } = getOpeningKills(match, puuid);
-
-	if (!player) {
-		throw new Error('Player not found in match');
+): PlayerMatchAnalysis | null {
+	if (
+		!match.is_available ||
+		!match.metadata ||
+		!match.players ||
+		!match.teams
+	) {
+		return null;
 	}
 
-	const team = player.team.toLowerCase() as 'red' | 'blue';
-	const result = match.teams[team].has_won ? 'win' : 'loss';
+	if (!isAnalyzableMode(match.metadata.mode, match.metadata.mode_id)) {
+		return null;
+	}
 
+	const player = match.players.all_players.find(
+		matchPlayer => matchPlayer.puuid === puuid,
+	);
+
+	if (!player) {
+		return null;
+	}
+
+	const { firstKills, firstDeaths } = getOpeningKills(match.kills, puuid);
+	const result = matchResult(player.team, match.teams);
 	const { kills, deaths, assists, score, headshots, bodyshots, legshots } =
 		player.stats;
-
 	const rounds = match.metadata.rounds_played;
-
 	const totalShots = headshots + bodyshots + legshots;
-
-	const headshotRate = totalShots === 0 ? 0 : headshots / totalShots;
-
-	const kd = deaths === 0 ? kills : kills / deaths;
-
-	const kda = deaths === 0 ? kills + assists : (kills + assists) / deaths;
-
-	const scorePerRound = rounds === 0 ? 0 : score / rounds;
-
-	const abilityCasts =
-		player.ability_casts.x_cast +
-		player.ability_casts.e_cast +
-		player.ability_casts.q_cast +
-		player.ability_casts.c_cast;
+	const casts = player.ability_casts;
 
 	return {
 		matchId: match.metadata.matchid,
@@ -74,22 +112,22 @@ export function analyzeMatch(
 
 		result,
 
-		agent: player.character,
+		agent: player.character ?? 'Unknown',
 
 		kills,
 		deaths,
 		assists,
 
-		kd,
-		kda,
+		kd: deaths === 0 ? kills : kills / deaths,
+		kda: deaths === 0 ? kills + assists : (kills + assists) / deaths,
 
 		score,
-		scorePerRound,
+		scorePerRound: rounds === 0 ? 0 : score / rounds,
 
 		headshots,
 		bodyshots,
 		legshots,
-		headshotRate,
+		headshotRate: totalShots === 0 ? 0 : headshots / totalShots,
 
 		damageMade: player.damage_made,
 		damageReceived: player.damage_received,
@@ -97,12 +135,20 @@ export function analyzeMatch(
 		firstKills,
 		firstDeaths,
 
-		afkRounds: player.behavior.afk_rounds,
-		roundsInSpawn: player.behavior.rounds_in_spawn,
+		afkRounds: num(player.behavior?.afk_rounds),
+		roundsInSpawn: num(player.behavior?.rounds_in_spawn),
+		friendlyFireOutgoing: num(player.behavior?.friendly_fire?.outgoing),
 
-		abilityCasts,
+		abilityCasts:
+			num(casts?.x_cast) +
+			num(casts?.e_cast) +
+			num(casts?.q_cast) +
+			num(casts?.c_cast),
 
-		spent: player.economy.spent.overall,
-		averageLoadoutValue: player.economy.loadout_value.average,
+		spent: num(player.economy?.spent?.overall),
+		averageLoadoutValue: num(player.economy?.loadout_value?.average),
+
+		rank: player.currenttier_patched,
+		rankId: player.currenttier,
 	};
 }

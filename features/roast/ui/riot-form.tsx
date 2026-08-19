@@ -3,7 +3,6 @@
 import { Stack } from '@/shared/components/layout/stack';
 import { useActionState } from 'react';
 import { getPlayerStats } from '../actions';
-import { analyzeMatch } from '../lib/analyze-match';
 import { RiotIdField } from './riot-id-field';
 import { RoastCta } from './roast-cta';
 
@@ -13,12 +12,6 @@ function RiotForm() {
 		riotId: null,
 		data: null,
 	});
-
-	const analysis = state.data?.matches[0]
-		? analyzeMatch(state.data?.matches[0], state.data?.account.puuid)
-		: null;
-
-	console.log(analysis);
 
 	return (
 		<form action={formAction}>

@@ -3,14 +3,14 @@
 import z from 'zod';
 import { getPlayerData } from './lib/get-player-data';
 import { RiotId, schema } from './schemas';
-import { RiotAccountData, ValorantMatch } from './types';
+import { PlayerAnalysis, RiotAccountData } from './types';
 
 export type PrevState = {
 	error: string | null;
 	riotId: RiotId | null;
 	data: {
 		account: RiotAccountData;
-		matches: ValorantMatch[];
+		analysis: PlayerAnalysis;
 	} | null;
 };
 
