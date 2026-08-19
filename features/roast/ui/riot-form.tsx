@@ -1,21 +1,17 @@
 'use client';
 
-import { useActionState } from 'react';
-
 import { Stack } from '@/shared/components/layout/stack';
-
-import { getRiotAccount } from '../actions';
+import { useActionState } from 'react';
+import { getPlayerStats } from '../actions';
 import { RiotIdField } from './riot-id-field';
 import { RoastCta } from './roast-cta';
 
 function RiotForm() {
-	const [state, formAction] = useActionState(getRiotAccount, {
+	const [state, formAction] = useActionState(getPlayerStats, {
 		error: null,
 		riotId: null,
 		data: null,
 	});
-
-	console.log(state.data)
 
 	return (
 		<form action={formAction}>

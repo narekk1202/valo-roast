@@ -1,21 +1,25 @@
 'use server';
 
 import z from 'zod';
-import { getValorantAccount } from './api/account';
+import { getPlayerData } from './lib/get-player-data';
 import { RiotId, schema } from './schemas';
-import { RiotAccountData } from './types';
+import { RiotAccountData, ValorantMatch } from './types';
 
 export type PrevState = {
 	error: string | null;
 	riotId: RiotId | null;
-	data: RiotAccountData | null;
+	data: {
+		account: RiotAccountData;
+		matches: ValorantMatch[];
+	} | null;
 };
 
-export async function getRiotAccount(
+export async function getPlayerStats(
 	_prevState: PrevState,
 	formData: FormData,
 ): Promise<PrevState> {
 	const riotId = formData.get('riotId')?.toString().trim() ?? '';
+
 	const validated = schema.safeParse(riotId);
 
 	if (!validated.success) {
@@ -34,7 +38,7 @@ export async function getRiotAccount(
 	const name = validated.data.slice(0, hashIndex);
 	const tag = validated.data.slice(hashIndex + 1);
 
-	const result = await getValorantAccount(name, tag);
+	const result = await getPlayerData(name, tag);
 
 	if (!result.ok) {
 		return {
