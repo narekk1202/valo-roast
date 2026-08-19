@@ -1,11 +1,11 @@
-import type { ReactNode } from 'react'
+import type { ReactNode } from 'react';
 
-import { Atmosphere } from '@/components/layout/atmosphere'
-import { CenteredStage } from '@/components/layout/centered-stage'
+import { Atmosphere } from '@/shared/components/layout/atmosphere';
+import { CenteredStage } from '@/shared/components/layout/centered-stage';
 
 type SiteShellProps = {
-	children: ReactNode
-}
+	children: ReactNode;
+};
 
 function SiteShell({ children }: SiteShellProps) {
 	return (
@@ -13,7 +13,7 @@ function SiteShell({ children }: SiteShellProps) {
 			<Atmosphere />
 			<CenteredStage>{children}</CenteredStage>
 		</div>
-	)
+	);
 }
 
-export { SiteShell }
+export { SiteShell };

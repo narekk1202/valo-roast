@@ -1,7 +1,7 @@
-import { cva, type VariantProps } from 'class-variance-authority'
-import type { ComponentProps } from 'react'
+import { cva, type VariantProps } from 'class-variance-authority';
+import type { ComponentProps } from 'react';
 
-import { cn } from '@/lib/utils'
+import { cn } from '@/shared/lib/utils';
 
 const stackVariants = cva('flex', {
 	variants: {
@@ -28,24 +28,18 @@ const stackVariants = cva('flex', {
 		gap: 'md',
 		align: 'stretch',
 	},
-})
+});
 
-type StackProps = ComponentProps<'div'> & VariantProps<typeof stackVariants>
+type StackProps = ComponentProps<'div'> & VariantProps<typeof stackVariants>;
 
-function Stack({
-	className,
-	direction,
-	gap,
-	align,
-	...props
-}: StackProps) {
+function Stack({ className, direction, gap, align, ...props }: StackProps) {
 	return (
 		<div
 			data-slot='stack'
 			className={cn(stackVariants({ direction, gap, align }), className)}
 			{...props}
 		/>
-	)
+	);
 }
 
-export { Stack, stackVariants }
+export { Stack, stackVariants };

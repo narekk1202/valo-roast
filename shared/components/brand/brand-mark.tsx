@@ -1,10 +1,10 @@
-import { cn } from '@/lib/utils'
+import { cn } from '@/shared/lib/utils';
 
 type BrandMarkProps = {
-	prefix?: string
-	accent?: string
-	className?: string
-}
+	prefix?: string;
+	accent?: string;
+	className?: string;
+};
 
 function BrandMark({
 	prefix = 'VALO',
@@ -16,13 +16,13 @@ function BrandMark({
 			data-slot='brand-mark'
 			className={cn(
 				'text-center font-heading text-2xl font-medium tracking-[0.55em] uppercase sm:text-3xl',
-				className
+				className,
 			)}
 		>
 			<span>{prefix}</span>
 			<span className='text-primary'>{accent}</span>
 		</h1>
-	)
+	);
 }
 
-export { BrandMark }
+export { BrandMark };

@@ -1,7 +1,7 @@
-import { cva, type VariantProps } from 'class-variance-authority'
-import type { ComponentProps } from 'react'
+import { cva, type VariantProps } from 'class-variance-authority';
+import type { ComponentProps } from 'react';
 
-import { cn } from '@/lib/utils'
+import { cn } from '@/shared/lib/utils';
 
 const textVariants = cva('text-pretty', {
 	variants: {
@@ -19,19 +19,14 @@ const textVariants = cva('text-pretty', {
 	defaultVariants: {
 		variant: 'lead',
 	},
-})
+});
 
 type TextProps = ComponentProps<'p'> &
 	VariantProps<typeof textVariants> & {
-		as?: 'p' | 'h1' | 'h2' | 'h3'
-	}
+		as?: 'p' | 'h1' | 'h2' | 'h3';
+	};
 
-function Text({
-	as: Comp = 'p',
-	className,
-	variant,
-	...props
-}: TextProps) {
+function Text({ as: Comp = 'p', className, variant, ...props }: TextProps) {
 	return (
 		<Comp
 			data-slot='text'
@@ -39,7 +34,7 @@ function Text({
 			className={cn(textVariants({ variant }), className)}
 			{...props}
 		/>
-	)
+	);
 }
 
-export { Text, textVariants }
+export { Text, textVariants };

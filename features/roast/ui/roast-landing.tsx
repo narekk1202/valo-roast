@@ -1,12 +1,12 @@
-import { BrandMark } from '@/components/brand/brand-mark'
-import { Reveal } from '@/components/layout/reveal'
-import { SiteShell } from '@/components/layout/site-shell'
-import { Stack } from '@/components/layout/stack'
-import { RoastCta } from '@/components/roast/roast-cta'
-import { RoastHero } from '@/components/roast/roast-hero'
-import { RiotIdField } from '@/components/roast/riot-id-field'
-import { Text } from '@/components/typography/text'
-import { landingCopy } from '@/content/landing'
+import { BrandMark } from '@/shared/components/brand/brand-mark';
+import { Reveal } from '@/shared/components/layout/reveal';
+import { SiteShell } from '@/shared/components/layout/site-shell';
+import { Stack } from '@/shared/components/layout/stack';
+import { Text } from '@/shared/components/typography/text';
+import { landingCopy } from '@/shared/content/landing';
+import { RoastHero } from './roast-hero'
+import { RiotIdField } from './riot-id-field'
+import { RoastCta } from './roast-cta'
 
 function RoastLanding() {
 	return (
@@ -32,7 +32,7 @@ function RoastLanding() {
 				</Reveal>
 			</Stack>
 		</SiteShell>
-	)
+	);
 }
 
-export { RoastLanding }
+export { RoastLanding };

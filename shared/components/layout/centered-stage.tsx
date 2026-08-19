@@ -1,8 +1,8 @@
-import type { ComponentProps } from 'react'
+import type { ComponentProps } from 'react';
 
-import { cn } from '@/lib/utils'
+import { cn } from '@/shared/lib/utils';
 
-type CenteredStageProps = ComponentProps<'main'>
+type CenteredStageProps = ComponentProps<'main'>;
 
 function CenteredStage({ className, ...props }: CenteredStageProps) {
 	return (
@@ -10,11 +10,11 @@ function CenteredStage({ className, ...props }: CenteredStageProps) {
 			data-slot='centered-stage'
 			className={cn(
 				'relative mx-auto flex min-h-svh w-full max-w-lg flex-col items-center justify-center px-6 py-16',
-				className
+				className,
 			)}
 			{...props}
 		/>
-	)
+	);
 }
 
-export { CenteredStage }
+export { CenteredStage };

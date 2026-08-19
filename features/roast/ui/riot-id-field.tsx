@@ -1,20 +1,20 @@
-import { SearchIcon } from 'lucide-react'
+import { SearchIcon } from 'lucide-react';
 
-import { HudFrame } from '@/components/layout/hud-frame'
-import { Field, FieldLabel } from '@/components/ui/field'
+import { HudFrame } from '@/shared/components/layout/hud-frame';
+import { Field, FieldLabel } from '@/shared/components/ui/field';
 import {
 	InputGroup,
 	InputGroupAddon,
 	InputGroupInput,
-} from '@/components/ui/input-group'
-import { landingCopy } from '@/content/landing'
+} from '@/shared/components/ui/input-group';
+import { landingCopy } from '@/shared/content/landing';
 
 type RiotIdFieldProps = {
-	id?: string
-	label?: string
-	defaultValue?: string
-	placeholder?: string
-}
+	id?: string;
+	label?: string;
+	defaultValue?: string;
+	placeholder?: string;
+};
 
 function RiotIdField({
 	id = 'riot-id',
@@ -41,7 +41,7 @@ function RiotIdField({
 				</InputGroup>
 			</HudFrame>
 		</Field>
-	)
+	);
 }
 
-export { RiotIdField }
+export { RiotIdField };

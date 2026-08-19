@@ -1,11 +1,11 @@
-import { Stack } from '@/components/layout/stack'
-import { Text } from '@/components/typography/text'
-import { landingCopy } from '@/content/landing'
+import { Stack } from '@/shared/components/layout/stack';
+import { Text } from '@/shared/components/typography/text';
+import { landingCopy } from '@/shared/content/landing';
 
 type RoastHeroProps = {
-	headline?: string
-	subhead?: string
-}
+	headline?: string;
+	subhead?: string;
+};
 
 function RoastHero({
 	headline = landingCopy.headline,
@@ -18,7 +18,7 @@ function RoastHero({
 			</Text>
 			<Text variant='lead'>{subhead}</Text>
 		</Stack>
-	)
+	);
 }
 
-export { RoastHero }
+export { RoastHero };
