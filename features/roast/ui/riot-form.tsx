@@ -15,8 +15,6 @@ function RiotForm() {
 		data: null,
 	});
 
-	console.log(state.data)
-
 	return (
 		<form action={formAction}>
 			<Stack gap='md' align='center' className='w-full'>
