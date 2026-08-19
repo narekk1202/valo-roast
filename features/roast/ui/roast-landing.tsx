@@ -4,9 +4,8 @@ import { SiteShell } from '@/shared/components/layout/site-shell';
 import { Stack } from '@/shared/components/layout/stack';
 import { Text } from '@/shared/components/typography/text';
 import { landingCopy } from '@/shared/content/landing';
-import { RoastHero } from './roast-hero'
-import { RiotIdField } from './riot-id-field'
-import { RoastCta } from './roast-cta'
+import { RiotForm } from './riot-form';
+import { RoastHero } from './roast-hero';
 
 function RoastLanding() {
 	return (
@@ -22,10 +21,7 @@ function RoastLanding() {
 					<RoastHero />
 				</Reveal>
 				<Reveal delay={2} className='w-full'>
-					<RiotIdField />
-				</Reveal>
-				<Reveal delay={3}>
-					<RoastCta />
+					<RiotForm />
 				</Reveal>
 				<Reveal delay={4}>
 					<Text variant='mute'>{landingCopy.disclaimer}</Text>
