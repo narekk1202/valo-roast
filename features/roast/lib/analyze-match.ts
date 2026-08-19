@@ -1,5 +1,31 @@
 import { PlayerMatchAnalysis, ValorantMatch } from '../types';
 
+function getOpeningKills(match: ValorantMatch, puuid: string) {
+	let firstKills = 0;
+	let firstDeaths = 0;
+
+	for (let round = 1; round <= match.metadata.rounds_played; round++) {
+		const firstKill = match.kills.find(kill => kill.round === round);
+
+		if (!firstKill) {
+			continue;
+		}
+
+		if (firstKill.killer_puuid === puuid) {
+			firstKills++;
+		}
+
+		if (firstKill.victim_puuid === puuid) {
+			firstDeaths++;
+		}
+	}
+
+	return {
+		firstKills,
+		firstDeaths,
+	};
+}
+
 export function analyzeMatch(
 	match: ValorantMatch,
 	puuid: string,
@@ -7,6 +33,8 @@ export function analyzeMatch(
 	const player = match.players.all_players.find(
 		player => player.puuid === puuid,
 	);
+
+	const { firstKills, firstDeaths } = getOpeningKills(match, puuid);
 
 	if (!player) {
 		throw new Error('Player not found in match');
@@ -66,8 +94,8 @@ export function analyzeMatch(
 		damageMade: player.damage_made,
 		damageReceived: player.damage_received,
 
-		firstKills: 0,
-		firstDeaths: 0,
+		firstKills,
+		firstDeaths,
 
 		afkRounds: player.behavior.afk_rounds,
 		roundsInSpawn: player.behavior.rounds_in_spawn,
