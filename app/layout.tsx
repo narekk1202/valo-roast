@@ -1,5 +1,5 @@
-import { ThemeProvider } from '@/shared/providers/theme-provider';
 import type { Metadata } from 'next';
+import { ThemeProvider } from '@/shared/providers/theme-provider';
 import { IBM_Plex_Mono, IBM_Plex_Sans, Teko } from 'next/font/google';
 import './globals.css';
 
@@ -22,8 +22,21 @@ const fontMono = IBM_Plex_Mono({
 });
 
 export const metadata: Metadata = {
-	title: 'ValoRoast',
+	title: {
+		default: 'ValoRoast',
+		template: '%s · ValoRoast',
+	},
 	description: 'Enter your Riot ID and find out how bad you are.',
+	openGraph: {
+		title: 'ValoRoast',
+		description: 'Enter your Riot ID and find out how bad you are.',
+		type: 'website',
+	},
+	twitter: {
+		card: 'summary',
+		title: 'ValoRoast',
+		description: 'Enter your Riot ID and find out how bad you are.',
+	},
 };
 
 export default function RootLayout({

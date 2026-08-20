@@ -1,4 +1,4 @@
-import { describe, expect, it, vi } from 'vitest';
+import { describe, expect, it } from 'vitest';
 import type { PlayerAnalysis } from '../types';
 import { generateRoast } from './generate-roast';
 
@@ -88,9 +88,15 @@ function analysis(): PlayerAnalysis {
 
 describe('generateRoast', () => {
 	it('returns trimmed roast text', async () => {
-		const result = await generateRoast(analysis(), async () => '  You peeked mid.  ');
+		const result = await generateRoast(
+			analysis(),
+			async () => '  You peeked mid every round.  ',
+		);
 
-		expect(result).toEqual({ ok: true, data: 'You peeked mid.' });
+		expect(result).toEqual({
+			ok: true,
+			data: 'You peeked mid every round.',
+		});
 	});
 
 	it('sends the roast prompt to the generator', async () => {
@@ -113,14 +119,10 @@ describe('generateRoast', () => {
 	});
 
 	it('fails when generation throws', async () => {
-		const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
-
 		const result = await generateRoast(analysis(), async () => {
 			throw new Error('boom');
 		});
 
 		expect(result).toEqual({ ok: false, error: 'Failed to generate roast' });
-		expect(errorSpy).toHaveBeenCalled();
-		errorSpy.mockRestore();
 	});
 });

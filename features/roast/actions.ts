@@ -1,27 +1,33 @@
 'use server';
 
+import { headers } from 'next/headers';
 import z from 'zod';
-import { generateRoast } from './lib/generate-roast';
-import { getPlayerData } from './lib/get-player-data';
-import { RiotId, schema } from './schemas';
-import { PlayerAnalysis, RiotAccountData } from './types';
+import { clientIp } from '@/shared/lib/client-ip';
+import { logEvent } from '@/shared/lib/log';
+import { getPlayerData, playerDataCache } from './lib/get-player-data';
+import { lookupLimiter, shareCache } from './lib/limiters';
+import { toPublicRoast, type PublicRoastView } from './lib/public-roast';
+import { riotIdKey, schema, splitRiotId, type RiotId } from './schemas';
 
 export type PrevState = {
 	error: string | null;
 	riotId: RiotId | null;
-	data: {
-		account: RiotAccountData;
-		analysis: PlayerAnalysis;
-	} | null;
-	roast: string | null;
+	view: PublicRoastView | null;
 };
+
+function state(
+	error: string | null,
+	riotId: RiotId | null,
+	view: PublicRoastView | null,
+): PrevState {
+	return { error, riotId, view };
+}
 
 export async function getPlayerStats(
 	_prevState: PrevState,
 	formData: FormData,
 ): Promise<PrevState> {
-	const riotId = formData.get('riotId')?.toString().trim() ?? '';
-
+	const riotId = formData.get('riotId')?.toString() ?? '';
 	const validated = schema.safeParse(riotId);
 
 	if (!validated.success) {
@@ -29,44 +35,47 @@ export async function getPlayerStats(
 			z.flattenError(validated.error).formErrors.join(', ') ||
 			'Invalid Riot ID format (expected Name#TAG)';
 
-		return {
-			error: errorMessage,
-			riotId: null,
-			data: null,
-			roast: null,
-		};
+		return state(errorMessage, null, null);
 	}
 
-	const hashIndex = validated.data.lastIndexOf('#');
-	const name = validated.data.slice(0, hashIndex);
-	const tag = validated.data.slice(hashIndex + 1);
+	const { name, tag } = splitRiotId(validated.data);
+	const key = riotIdKey(name, tag);
+	const cachedShare = shareCache.get(key);
+
+	if (cachedShare?.roast) {
+		logEvent('roast.lookup', { cache: 'share', key });
+		return state(null, validated.data, cachedShare);
+	}
+
+	const cachedPlayer = playerDataCache.get(key);
+
+	if (!cachedPlayer) {
+		const ip = clientIp(await headers());
+		const limited = lookupLimiter.consume(ip);
+
+		if (!limited.ok) {
+			return state(
+				'Too many lookups. Please wait a moment.',
+				validated.data,
+				null,
+			);
+		}
+	}
 
 	const result = await getPlayerData(name, tag);
 
 	if (!result.ok) {
-		return {
-			error: result.error,
-			riotId: validated.data,
-			data: null,
-			roast: null,
-		};
+		return state(result.error, validated.data, null);
 	}
 
-	const roastResult = await generateRoast(result.data.analysis);
+	logEvent('roast.lookup', {
+		cache: cachedPlayer ? 'hit' : 'miss',
+		key,
+	});
 
-	if (!roastResult.ok) {
-		return {
-			error: roastResult.error,
-			riotId: validated.data,
-			data: result.data,
-			roast: null,
-		};
-	}
-
-	return {
-		error: null,
-		riotId: validated.data,
-		data: result.data,
-		roast: roastResult.data,
-	};
+	return state(
+		null,
+		validated.data,
+		toPublicRoast(result.data.account, result.data.analysis, null),
+	);
 }

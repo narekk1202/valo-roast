@@ -1,13 +1,15 @@
+'use client';
+
+import Image from 'next/image';
+import { useState } from 'react';
 import { HudFrame } from '@/shared/components/layout/hud-frame';
 import { Stack } from '@/shared/components/layout/stack';
 import { Text } from '@/shared/components/typography/text';
-import { toRoastFacts } from '../lib/roast-prompt';
-import type { PlayerAnalysis, RiotAccountData } from '../types';
-import Image from 'next/image'
+import { Button } from '@/shared/components/ui/button';
+import type { PublicRoastView } from '../lib/public-roast';
 
 type RoastResultProps = {
-	account: RiotAccountData;
-	analysis: PlayerAnalysis;
+	view: PublicRoastView;
 	roast: string | null;
 };
 
@@ -24,9 +26,30 @@ function Receipt({ label, value }: { label: string; value: string }) {
 	);
 }
 
-function RoastResult({ account, analysis, roast }: RoastResultProps) {
-	const facts = toRoastFacts(analysis);
-	const cardSrc = account.card.small;
+function ShareButton({ path }: { path: string }) {
+	const [copied, setCopied] = useState(false);
+
+	async function copy() {
+		const url = new URL(path, window.location.origin).toString();
+
+		try {
+			await navigator.clipboard.writeText(url);
+			setCopied(true);
+			window.setTimeout(() => setCopied(false), 1600);
+		} catch {
+			window.prompt('Copy this roast link', url);
+		}
+	}
+
+	return (
+		<Button type='button' variant='outline' size='sm' onClick={copy}>
+			{copied ? 'Copied' : 'Copy link'}
+		</Button>
+	);
+}
+
+function RoastResult({ view, roast }: RoastResultProps) {
+	const { facts, cardSmall } = view;
 
 	return (
 		<HudFrame className='w-full'>
@@ -36,10 +59,10 @@ function RoastResult({ account, analysis, roast }: RoastResultProps) {
 			>
 				<Text variant='label'>Verdict</Text>
 				<div className='flex items-center gap-3'>
-					{cardSrc ? (
+					{cardSmall ? (
 						<Image
-							src={cardSrc}
-							alt={`${account.name} ${account.tag} card`}
+							src={cardSmall}
+							alt={`${facts.riotId} card`}
 							width={48}
 							height={48}
 							className='size-12 shrink-0 object-cover'
@@ -70,13 +93,13 @@ function RoastResult({ account, analysis, roast }: RoastResultProps) {
 					<Receipt label='HS%' value={facts.headshotRate} />
 					<Receipt label='Ego' value={String(facts.scores.ego)} />
 				</dl>
-				{facts.mainAgent || facts.worstMap ? (
-					<p className='font-mono text-[0.7rem] tracking-wide text-muted-foreground uppercase'>
-						{facts.mainAgent ? `Main ${facts.mainAgent}` : null}
-						{facts.mainAgent && facts.worstMap ? ' · ' : null}
-						{facts.worstMap ? `Cursed ${facts.worstMap}` : null}
-					</p>
-				) : null}
+				<p className='font-mono text-[0.7rem] tracking-wide text-muted-foreground uppercase'>
+					Based on {facts.matchCount} competitive{' '}
+					{facts.matchCount === 1 ? 'game' : 'games'}
+					{facts.mainAgent ? ` · Main ${facts.mainAgent}` : null}
+					{facts.worstMap ? ` · Cursed ${facts.worstMap}` : null}
+				</p>
+				<ShareButton path={view.sharePath} />
 			</Stack>
 		</HudFrame>
 	);

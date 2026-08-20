@@ -1,39 +1,62 @@
 'use client';
 
 import { Stack } from '@/shared/components/layout/stack';
-import { useActionState } from 'react';
-import { getPlayerStats } from '../actions';
+import { Button } from '@/shared/components/ui/button';
+import type { PublicRoastView } from '../lib/public-roast';
+
 import { RiotIdField } from './riot-id-field';
 import { RoastCta } from './roast-cta';
 import { RoastPending } from './roast-pending';
 import { RoastResult } from './roast-result';
+import { useRiotForm } from '../hooks/use-riot-form'
 
-function RiotForm() {
-	const [state, formAction, isPending] = useActionState(getPlayerStats, {
-		error: null,
-		riotId: null,
-		data: null,
-		roast: null,
-	});
+type RiotFormProps = {
+	initialRiotId?: string;
+	initialView?: PublicRoastView | null;
+};
+
+function RiotForm({ initialRiotId = '', initialView = null }: RiotFormProps) {
+	const {
+		riotId,
+		setRiotId,
+		roast,
+		streaming,
+		streamError,
+		retryRoast,
+		wrappedAction,
+		isPending,
+		view,
+		state
+	} = useRiotForm(initialRiotId, initialView);
 
 	return (
-		<form action={formAction} aria-busy={isPending}>
+		<form action={wrappedAction} aria-busy={isPending || streaming}>
 			<Stack gap='md' align='center' className='w-full'>
-				<RiotIdField disabled={isPending} />
-				{isPending ? <RoastPending /> : null}
-				{!isPending && state.data ? (
-					<RoastResult
-						account={state.data.account}
-						analysis={state.data.analysis}
-						roast={state.roast}
-					/>
+				<RiotIdField
+					disabled={isPending || streaming}
+					value={riotId}
+					onValueChange={setRiotId}
+					error={state.error}
+				/>
+				{isPending || (streaming && !roast) ? <RoastPending /> : null}
+				{!isPending && view && (roast || streamError) ? (
+					<RoastResult view={view} roast={roast} />
 				) : null}
-				{state.error && !isPending ? (
-					<p aria-live='polite' className='text-destructive text-sm'>
-						{state.error}
+				{(state.error || streamError) && !isPending ? (
+					<p
+						id='riot-id-error'
+						aria-live='polite'
+						className='text-destructive text-sm'
+					>
+						{streamError ?? state.error}
 					</p>
 				) : null}
-				<RoastCta isPending={isPending} />
+				{streamError && view ? (
+					<Button type='button' variant='outline' onClick={retryRoast}>
+						Try roast again
+					</Button>
+				) : null}
+				<RoastCta isPending={isPending || streaming} />
 			</Stack>
 		</form>
 	);

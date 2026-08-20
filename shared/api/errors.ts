@@ -6,10 +6,10 @@ export function httpErrorMessage(
 		return 'Rate limit exceeded. Please wait a moment.';
 	}
 	if (status === 401 || status === 403) {
-		return 'API key issue';
+		return 'Service unavailable';
 	}
 	if (status === 404) {
-		return 'Not found';
+		return fallback === 'Request failed' ? 'Not found' : fallback;
 	}
 
 	return fallback;

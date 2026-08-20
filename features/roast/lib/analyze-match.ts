@@ -1,25 +1,14 @@
 import { MatchKill, MatchTeams, PlayerMatchAnalysis, ValorantMatch } from '../types';
 
-const SKIP_MODE_IDS = new Set([
-	'deathmatch',
-	'ggteam',
-	'onefa',
-	'snowball',
-	'hurm',
-]);
-
-const SKIP_MODE_NAME = /deathmatch|escalation|replication|snowball/;
-
 function num(value: number | null | undefined): number {
 	return value ?? 0;
 }
 
-function isAnalyzableMode(mode: string, modeId: string): boolean {
-	if (SKIP_MODE_IDS.has(modeId.toLowerCase())) {
-		return false;
-	}
-
-	return !SKIP_MODE_NAME.test(mode.toLowerCase());
+function isCompetitive(mode: string, modeId: string): boolean {
+	return (
+		modeId.toLowerCase() === 'competitive' ||
+		mode.toLowerCase() === 'competitive'
+	);
 }
 
 function getOpeningKills(kills: MatchKill[], puuid: string) {
@@ -82,7 +71,7 @@ export function analyzeMatch(
 		return null;
 	}
 
-	if (!isAnalyzableMode(match.metadata.mode, match.metadata.mode_id)) {
+	if (!isCompetitive(match.metadata.mode, match.metadata.mode_id)) {
 		return null;
 	}
 

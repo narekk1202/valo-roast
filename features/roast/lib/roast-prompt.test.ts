@@ -118,6 +118,7 @@ describe('toRoastFacts', () => {
 		expect(facts.kd).toBe('0.80');
 		expect(facts.acs).toBe('9');
 		expect(facts.headshotRate).toBe('13%');
+		expect(facts.matchCount).toBe(5);
 		expect(JSON.stringify(facts)).not.toContain('secret-puuid');
 	});
 

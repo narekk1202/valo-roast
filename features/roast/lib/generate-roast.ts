@@ -1,8 +1,11 @@
 import { groq } from '@ai-sdk/groq';
 import { generateText } from 'ai';
 import type { ApiResult } from '@/shared/api/unwrap';
+import { GROQ_TIMEOUT_MS } from '@/shared/lib/limits';
+import { logEvent } from '@/shared/lib/log';
 import type { PlayerAnalysis } from '../types';
 import { buildRoastPrompt } from './roast-prompt';
+import { sanitizeRoast } from './sanitize-roast';
 
 export type RoastGenerator = (input: {
 	system: string;
@@ -22,6 +25,7 @@ async function generateWithGroq({
 		prompt,
 		temperature: 0.8,
 		maxOutputTokens: 1024,
+		timeout: GROQ_TIMEOUT_MS,
 		providerOptions: {
 			groq: { reasoningEffort: 'low' },
 		},
@@ -35,20 +39,32 @@ export async function generateRoast(
 	generate: RoastGenerator = generateWithGroq,
 ): Promise<ApiResult<string>> {
 	const { system, prompt } = buildRoastPrompt(analysis);
+	const started = Date.now();
 
 	try {
-		const roast = (await generate({ system, prompt })).trim();
+		const roast = await generate({ system, prompt });
+		const sanitized = sanitizeRoast(roast);
 
-		if (!roast) {
-			return { ok: false, error: 'Roast came back empty' };
-		}
+		logEvent('groq.roast', {
+			ok: sanitized.ok,
+			durationMs: Date.now() - started,
+		});
 
-		return { ok: true, data: roast };
+		return sanitized;
 	} catch (error) {
-		console.error(
-			'generateRoast failed:',
-			error instanceof Error ? error.message : error,
-		);
-		return { ok: false, error: 'Failed to generate roast' };
+		const timedOut =
+			error instanceof Error &&
+			(error.name === 'AbortError' || error.name === 'TimeoutError');
+
+		logEvent('groq.roast', {
+			ok: false,
+			timedOut,
+			durationMs: Date.now() - started,
+		});
+
+		return {
+			ok: false,
+			error: timedOut ? 'Request timed out' : 'Failed to generate roast',
+		};
 	}
 }

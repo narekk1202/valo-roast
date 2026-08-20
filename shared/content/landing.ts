@@ -6,5 +6,6 @@ export const landingCopy = {
 	riotIdLabel: 'Riot ID',
 	riotIdSample: '',
 	cta: 'Roast me',
-	disclaimer: 'No mercy. No refunds.',
+	disclaimer:
+		'Unofficial fan project. Not affiliated with Riot Games. Match data via HenrikDev. Roasts are jokes, not facts.',
 } as const

@@ -1,6 +1,8 @@
 import { describe, expect, it } from 'vitest';
+import { TtlCache } from '@/shared/lib/ttl-cache';
 import type { MatchPlayer, RiotAccountData, ValorantMatch } from '../types';
 import { buildPlayerStats } from './build-player-stats';
+import { getPlayerData, type GetPlayerDataSuccess } from './get-player-data';
 
 const account: RiotAccountData = {
 	puuid: 'p-self',
@@ -106,5 +108,40 @@ describe('buildPlayerStats', () => {
 		};
 
 		expect(buildPlayerStats(account, [deathmatch])).toBeNull();
+	});
+});
+
+describe('getPlayerData', () => {
+	it('returns a cache hit without calling Henrik again', async () => {
+		const cache = new TtlCache<GetPlayerDataSuccess>(60_000, () => 0);
+		const analysis = buildPlayerStats(account, [competitiveMatch()]);
+		cache.set('narek#000', { account, analysis: analysis! });
+
+		let accountCalls = 0;
+		const result = await getPlayerData('Narek', '000', {
+			cache,
+			getAccount: async () => {
+				accountCalls += 1;
+				return { ok: false, error: 'should not run' };
+			},
+		});
+
+		expect(accountCalls).toBe(0);
+		expect(result.ok).toBe(true);
+	});
+
+	it('returns competitive-only empty copy', async () => {
+		const cache = new TtlCache<GetPlayerDataSuccess>(60_000, () => 0);
+
+		const result = await getPlayerData('Narek', '000', {
+			cache,
+			getAccount: async () => ({ ok: true, data: account }),
+			getMatchList: async () => ({ ok: true, data: [] }),
+		});
+
+		expect(result).toEqual({
+			ok: false,
+			error: 'No competitive matches found',
+		});
 	});
 });

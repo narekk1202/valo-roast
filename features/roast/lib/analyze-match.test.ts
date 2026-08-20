@@ -187,6 +187,22 @@ describe('analyzeMatch', () => {
 		expect(analyzeMatch(match, PUUID)).toBeNull();
 	});
 
+	it('returns null for unrated', () => {
+		const base = makeMatch();
+		const analysis = analyzeMatch(
+			makeMatch({
+				metadata: {
+					...base.metadata!,
+					mode: 'Unrated',
+					mode_id: 'unrated',
+				},
+			}),
+			PUUID,
+		);
+
+		expect(analysis).toBeNull();
+	});
+
 	it('returns null for deathmatch', () => {
 		const base = makeMatch();
 		const analysis = analyzeMatch(

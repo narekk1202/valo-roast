@@ -16,6 +16,7 @@ export type RoastFacts = {
 	friendlyFireDamage: number;
 	mainAgent: string | null;
 	worstMap: string | null;
+	matchCount: number;
 	scores: PlayerScores;
 };
 
@@ -56,6 +57,7 @@ export function toRoastFacts(analysis: PlayerAnalysis): RoastFacts {
 		friendlyFireDamage: analysis.behavior.friendlyFireDamage,
 		mainAgent: analysis.agents[0]?.name ?? null,
 		worstMap: worstMapName(analysis.maps),
+		matchCount: analysis.matches.total,
 		scores: analysis.scores,
 	};
 }
@@ -70,7 +72,7 @@ export function buildRoastPrompt(analysis: PlayerAnalysis): {
 	const lines = [
 		`Player: ${facts.riotId}`,
 		`Rank: ${facts.rank} (level ${facts.level})`,
-		`Record: ${facts.record} (${facts.winRate}) over ${analysis.matches.total} games`,
+		`Record: ${facts.record} (${facts.winRate}) over ${facts.matchCount} competitive games`,
 		`Combat: ${facts.kd} KD, ${facts.acs} ACS, ${facts.headshotRate} HS`,
 		`Openings: ${facts.firstKills} first kills / ${facts.firstDeaths} first deaths`,
 		`Behavior: ${facts.afkRounds} AFK rounds, ${facts.roundsInSpawn} rounds in spawn, ${facts.friendlyFireDamage} friendly fire damage`,

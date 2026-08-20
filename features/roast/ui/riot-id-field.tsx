@@ -12,17 +12,21 @@ import { landingCopy } from '@/shared/content/landing';
 type RiotIdFieldProps = {
 	id?: string;
 	label?: string;
-	defaultValue?: string;
+	value?: string;
+	onValueChange?: (value: string) => void;
 	placeholder?: string;
 	disabled?: boolean;
+	error?: string | null;
 };
 
 function RiotIdField({
 	id = 'riot-id',
 	label = landingCopy.riotIdLabel,
-	defaultValue = landingCopy.riotIdSample,
+	value = landingCopy.riotIdSample,
+	onValueChange,
 	placeholder = 'Narek#03270624',
 	disabled = false,
+	error = null,
 }: RiotIdFieldProps) {
 	return (
 		<Field data-disabled={disabled || undefined}>
@@ -32,11 +36,15 @@ function RiotIdField({
 					<InputGroupInput
 						id={id}
 						name='riotId'
-						defaultValue={defaultValue}
+						value={value}
+						onChange={event => onValueChange?.(event.target.value)}
 						placeholder={placeholder}
 						autoComplete='off'
 						spellCheck={false}
 						disabled={disabled}
+						maxLength={22}
+						aria-invalid={error ? true : undefined}
+						aria-describedby={error ? 'riot-id-error' : undefined}
 					/>
 					<InputGroupAddon align='inline-end'>
 						<SearchIcon aria-hidden />
