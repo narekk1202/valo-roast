@@ -63,6 +63,7 @@ function RoastResult({ view, roast }: RoastResultProps) {
 						<Image
 							src={cardSmall}
 							alt={`${facts.riotId} card`}
+							loading='eager'
 							width={48}
 							height={48}
 							className='size-12 shrink-0 object-cover'
